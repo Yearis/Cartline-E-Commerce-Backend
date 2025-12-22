@@ -1,0 +1,39 @@
+# version for our compose.yaml file
+version: '3.8'
+
+# List of my technologies used
+services:
+
+  # 1st technology is MySQL we fix its version to 8.0
+  mysql:
+    image: 'mysql:8.0'
+    container_name: mysql_e_commerce_db_container
+    # we set our credentials
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASS}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASS}
+
+    # we set our port for our database
+    ports:
+      - '3309:3306'
+
+    # our storage for container
+    volumes:
+      - mysql_e_commerce_db_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+    restart: always
+
+# we declare our storage
+volumes:
+  mysql_e_commerce_db_data:
+
+# commands
+#   To run the container: docker-compose up -d
+#   To check status: docker ps
