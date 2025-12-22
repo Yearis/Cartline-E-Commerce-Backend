@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -49,7 +50,7 @@ public class ProductServiceImpl implements ProductService {
 
             BigDecimal discountAmount = product.getPrice()
                     .multiply(product.getDiscount())
-                    .divide(new BigDecimal("100"), java.math.RoundingMode.HALF_UP);
+                    .divide(new BigDecimal("100"), RoundingMode.HALF_UP);
 
             // discounted price = price - discountAmount
             BigDecimal discountedPrice = product.getPrice().subtract(discountAmount);
@@ -84,8 +85,17 @@ public class ProductServiceImpl implements ProductService {
         summary.setDiscount(product.getDiscount());
 
         if (product.getDiscount() != null && product.getDiscount().compareTo(BigDecimal.ZERO) > 0) {
-            summary.setDiscountedPrice(product.getPrice().subtract(product.getDiscount()));
+
+            BigDecimal discountAmount = product.getPrice()
+                    .multiply(product.getDiscount())
+                    .divide(new BigDecimal("100"), RoundingMode.HALF_UP);
+
+            // discounted price = price - discountAmount
+            BigDecimal discountedPrice = product.getPrice().subtract(discountAmount);
+
+            summary.setDiscountedPrice(discountedPrice);
         } else {
+
             summary.setDiscountedPrice(product.getPrice());
         }
 

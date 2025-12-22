@@ -29,3 +29,29 @@ CREATE TABLE IF NOT EXISTS products_categories(
     REFERENCES categories(id)
     ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS carts (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    total_amount DECIMAL(13, 2) NOT NULL
+#     user_id BIGINT NOT NULL,
+#
+#     FOREIGN KEY (user_id)
+#     REFERENCES users(id)
+#     ON DELETE CASCADE
+)AUTO_INCREMENT = 10001;
+
+CREATE TABLE IF NOT EXISTS cart_items (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    quantity INT NOT NULL,
+    unit_price DECIMAL(13, 2) NOT NULL,
+    total_price DECIMAL(13, 2) NOT NULL,
+    product_id BIGINT NOT NULL,
+    cart_id BIGINT NOT NULL,
+
+    FOREIGN KEY (product_id)
+    REFERENCES products(id),
+
+    FOREIGN KEY (cart_id)
+    REFERENCES carts(id)
+    ON DELETE CASCADE
+)AUTO_INCREMENT = 10001;
