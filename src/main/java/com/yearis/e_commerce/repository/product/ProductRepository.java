@@ -1,4 +1,4 @@
-package com.yearis.e_commerce.repository;
+package com.yearis.e_commerce.repository.product;
 
 import com.yearis.e_commerce.entity.Product;
 import org.springframework.data.domain.Page;

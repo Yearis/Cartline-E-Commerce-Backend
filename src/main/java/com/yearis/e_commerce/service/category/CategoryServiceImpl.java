@@ -2,9 +2,9 @@ package com.yearis.e_commerce.service.category;
 
 import com.yearis.e_commerce.entity.Category;
 import com.yearis.e_commerce.exception.CategoryNotFoundException;
-import com.yearis.e_commerce.payload.request.CategoryRequest;
-import com.yearis.e_commerce.payload.response.CategoryResponse;
-import com.yearis.e_commerce.repository.CategoryRepository;
+import com.yearis.e_commerce.payload.category.CategoryRequest;
+import com.yearis.e_commerce.payload.category.CategoryResponse;
+import com.yearis.e_commerce.repository.category.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

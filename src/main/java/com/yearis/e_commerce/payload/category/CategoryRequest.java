@@ -1,4 +1,4 @@
-package com.yearis.e_commerce.payload.request;
+package com.yearis.e_commerce.payload.category;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

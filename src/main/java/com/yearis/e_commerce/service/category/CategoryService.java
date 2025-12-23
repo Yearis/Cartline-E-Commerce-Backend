@@ -1,7 +1,7 @@
 package com.yearis.e_commerce.service.category;
 
-import com.yearis.e_commerce.payload.request.CategoryRequest;
-import com.yearis.e_commerce.payload.response.CategoryResponse;
+import com.yearis.e_commerce.payload.category.CategoryRequest;
+import com.yearis.e_commerce.payload.category.CategoryResponse;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
-package com.yearis.e_commerce.controller;
+package com.yearis.e_commerce.controller.product;
 
-import com.yearis.e_commerce.payload.request.ProductRequest;
-import com.yearis.e_commerce.payload.response.ProductResponse;
-import com.yearis.e_commerce.payload.response.ProductResponseSummary;
+import com.yearis.e_commerce.payload.product.ProductRequest;
+import com.yearis.e_commerce.payload.product.ProductResponse;
+import com.yearis.e_commerce.payload.product.ProductResponseSummary;
 import com.yearis.e_commerce.service.product.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

@@ -1,5 +1,6 @@
-package com.yearis.e_commerce.payload.response;
+package com.yearis.e_commerce.payload.product;
 
+import com.yearis.e_commerce.payload.category.CategoryResponse;
 import lombok.Data;
 
 import java.math.BigDecimal;

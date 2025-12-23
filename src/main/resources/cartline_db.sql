@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS products_categories(
 
 CREATE TABLE IF NOT EXISTS carts (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    total_amount DECIMAL(13, 2) NOT NULL
+    total_amount DECIMAL(13, 2) NOT NULL DEFAULT 0.00
 #     user_id BIGINT NOT NULL,
 #
 #     FOREIGN KEY (user_id)

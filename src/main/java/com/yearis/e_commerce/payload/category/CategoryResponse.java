@@ -1,8 +1,6 @@
-package com.yearis.e_commerce.payload.response;
+package com.yearis.e_commerce.payload.category;
 
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 public class CategoryResponse {

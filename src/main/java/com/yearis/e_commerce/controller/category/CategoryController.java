@@ -1,7 +1,7 @@
-package com.yearis.e_commerce.controller;
+package com.yearis.e_commerce.controller.category;
 
-import com.yearis.e_commerce.payload.request.CategoryRequest;
-import com.yearis.e_commerce.payload.response.CategoryResponse;
+import com.yearis.e_commerce.payload.category.CategoryRequest;
+import com.yearis.e_commerce.payload.category.CategoryResponse;
 import com.yearis.e_commerce.service.category.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
