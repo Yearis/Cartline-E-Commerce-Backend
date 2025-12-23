@@ -55,3 +55,31 @@ CREATE TABLE IF NOT EXISTS cart_items (
     REFERENCES carts(id)
     ON DELETE CASCADE
 )AUTO_INCREMENT = 10001;
+
+CREATE TABLE IF NOT EXISTS orders (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    order_date DATE NOT NULL,
+    total_amount DECIMAL(13, 2) NOT NULL,
+    order_status VARCHAR(255)
+#     user_id BIGINT NOT NULL,
+#
+#     FOREIGN KEY (user_id)
+#     REFERENCES users(id)
+#     ON DELETE CASCADE
+)AUTO_INCREMENT = 10001;
+
+CREATE TABLE IF NOT EXISTS order_items (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    quantity INT NOT NULL,
+    unit_price DECIMAL(13, 2) NOT NULL,
+    total_price DECIMAL(13, 2) NOT NULL,
+    product_id BIGINT NOT NULL,
+    order_id BIGINT NOT NULL,
+
+    FOREIGN KEY (product_id)
+    REFERENCES products(id),
+
+    FOREIGN KEY (order_id)
+    REFERENCES orders(id)
+    ON DELETE CASCADE
+)AUTO_INCREMENT = 10001;
