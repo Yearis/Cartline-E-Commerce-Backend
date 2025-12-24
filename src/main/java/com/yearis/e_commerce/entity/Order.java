@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,15 +26,18 @@ public class Order {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "order_date")
-    private LocalDate orderDate;
+    @Column(name = "order_date_time", nullable = false)
+    private LocalDateTime orderDateAndTime;
 
-    @Column(name = "total_amount")
+    @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "order_status")
+    @Column(name = "order_status", nullable = false)
     private OrderStatus orderStatus;
+
+    @Column(name = "shipping_address", nullable = false)
+    private String shippingAddress;
 
     // Relationships:
 

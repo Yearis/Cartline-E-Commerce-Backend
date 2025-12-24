@@ -5,7 +5,7 @@ import com.yearis.e_commerce.payload.orderitem.OrderItemResponse;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -13,11 +13,13 @@ public class OrderResponse {
 
     private Long id;
 
-    private LocalDate orderDate;
+    private LocalDateTime orderDateAndTime;
 
     private BigDecimal totalAmount;
 
     private OrderStatus orderStatus;
+
+    private String shippingAddress;
 
     private Set<OrderItemResponse> orderItems;
 }

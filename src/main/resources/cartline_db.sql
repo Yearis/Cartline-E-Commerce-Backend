@@ -58,9 +58,10 @@ CREATE TABLE IF NOT EXISTS cart_items (
 
 CREATE TABLE IF NOT EXISTS orders (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    order_date DATE NOT NULL,
+    order_date_time DATETIME NOT NULL,
     total_amount DECIMAL(13, 2) NOT NULL,
-    order_status VARCHAR(255)
+    order_status VARCHAR(255) NOT NULL ,
+    shipping_address VARCHAR(255) NOT NULL
 #     user_id BIGINT NOT NULL,
 #
 #     FOREIGN KEY (user_id)

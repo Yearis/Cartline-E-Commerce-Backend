@@ -3,7 +3,9 @@ package com.yearis.e_commerce.enums;
 public enum OrderStatus {
     PENDING,
     PROCESSING,
-    SHIPPED,
+    IN_TRANSIT,
+    ARRIVED_AT_HUB,
+    OUT_FOR_DELIVERY,
     DELIVERED,
     CANCELLED
 }

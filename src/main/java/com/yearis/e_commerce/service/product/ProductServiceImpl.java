@@ -3,6 +3,7 @@ package com.yearis.e_commerce.service.product;
 import com.yearis.e_commerce.entity.Category;
 import com.yearis.e_commerce.entity.Product;
 import com.yearis.e_commerce.exception.CategoryNotFoundException;
+import com.yearis.e_commerce.exception.InventoryException;
 import com.yearis.e_commerce.exception.ProductNotFoundException;
 import com.yearis.e_commerce.payload.product.ProductRequest;
 import com.yearis.e_commerce.payload.category.CategoryResponse;
@@ -121,6 +122,35 @@ public class ProductServiceImpl implements ProductService {
         product.setCategories(categories);
 
         return product;
+    }
+
+    // --- Helper ---
+    @Override
+    @Transactional
+    public void reduceStock(Long productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found!"));
+
+        int newStock = product.getInventory() - quantity;
+
+        if (newStock < 0) {
+            throw new InventoryException("Inventory cannot be less than 0");
+        }
+
+        product.setInventory(newStock);
+        productRepository.save(product);
+    }
+
+    @Override
+    @Transactional
+    public void increaseStock(Long productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found!"));
+
+        int newStock = product.getInventory() + quantity;
+
+        product.setInventory(newStock);
+        productRepository.save(product);
     }
 
     @Override
