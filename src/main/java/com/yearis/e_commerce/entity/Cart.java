@@ -30,12 +30,12 @@ public class Cart {
 
     // Relationships:
 
-    /*
-         1 cart -> 1 user
-         @OneToOne
-         @JoinColumn(name = "user_id")
-         private User user;
-    */
+
+    // 1 cart -> 1 user
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
 
     // 1 cart -> Many items
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true) // so that when cart deletes everything is deleted

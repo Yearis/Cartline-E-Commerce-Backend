@@ -41,12 +41,12 @@ public class Order {
 
     // Relationships:
 
-    /*
-        // Many orders -> 1 user
-        @ManyToOne
-        @JoinColumn(name = "user_id")
-        private User user;
-    */
+
+    // Many orders -> 1 user
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
 
     // 1 order -> many items
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
