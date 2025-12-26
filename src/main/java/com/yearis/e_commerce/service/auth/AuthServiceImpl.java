@@ -3,6 +3,8 @@ package com.yearis.e_commerce.service.auth;
 import com.yearis.e_commerce.entity.Cart;
 import com.yearis.e_commerce.entity.Role;
 import com.yearis.e_commerce.entity.User;
+import com.yearis.e_commerce.exception.RoleNotFoundException;
+import com.yearis.e_commerce.exception.UserAlreadyExistsException;
 import com.yearis.e_commerce.payload.auth.JwtAuthResponse;
 import com.yearis.e_commerce.payload.auth.LoginRequest;
 import com.yearis.e_commerce.payload.auth.RegisterRequest;
@@ -44,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
         // now we set the userRole for user initially user is only a user,
         // but they can apply for seller which will be only approved by admin
         Role userRole = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new RuntimeException("Error: Role not found!!"));
+                .orElseThrow(() -> new RoleNotFoundException("Role not found!!"));
 
         user.setRoles(Set.of(userRole));
 
@@ -65,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
         // 1st we check if the email is used by another user
         if (userRepository.existsByEmail(request.getEmail())) {
 
-            throw new RuntimeException("Email is already been used!\nTry another email");
+            throw new UserAlreadyExistsException("Email is already been used!\nTry another email");
         }
 
         // if every is okay we build the user

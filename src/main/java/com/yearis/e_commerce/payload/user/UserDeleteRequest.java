@@ -1,6 +1,5 @@
 package com.yearis.e_commerce.payload.user;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -11,10 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class UserDeleteRequest {
-
-    @NotBlank(message = "Email is mandatory")
-    @Email(message = "Invalid email format")
-    private String email;
 
     @NotBlank(message = "Password is mandatory")
     @Size(min = 8, max = 30, message = "Password must be at least 8 characters")

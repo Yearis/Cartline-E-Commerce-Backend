@@ -1,13 +1,8 @@
 package com.yearis.e_commerce.service.order;
 
-import com.yearis.e_commerce.entity.Cart;
-import com.yearis.e_commerce.entity.Order;
-import com.yearis.e_commerce.entity.OrderItem;
-import com.yearis.e_commerce.entity.Product;
+import com.yearis.e_commerce.entity.*;
 import com.yearis.e_commerce.enums.OrderStatus;
-import com.yearis.e_commerce.exception.CartNotFoundException;
-import com.yearis.e_commerce.exception.InventoryException;
-import com.yearis.e_commerce.exception.OrderNotFoundException;
+import com.yearis.e_commerce.exception.*;
 import com.yearis.e_commerce.payload.order.OrderRequest;
 import com.yearis.e_commerce.payload.order.OrderResponse;
 import com.yearis.e_commerce.payload.orderitem.OrderItemResponse;
@@ -15,9 +10,12 @@ import com.yearis.e_commerce.payload.product.ProductResponseSummary;
 import com.yearis.e_commerce.repository.cart.CartRepository;
 
 import com.yearis.e_commerce.repository.order.OrderRepository;
+import com.yearis.e_commerce.repository.user.UserRepository;
 import com.yearis.e_commerce.service.cart.CartService;
 import com.yearis.e_commerce.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +23,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,6 +36,7 @@ public class OrderServiceImpl implements OrderService {
     private final CartService cartService;
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
 
     // --- Mappers ---
 
@@ -61,8 +61,6 @@ public class OrderServiceImpl implements OrderService {
                     orderItemResponse.setTotalPrice(item.getTotalPrice());
                     return  orderItemResponse;
                 }).collect(Collectors.toSet());
-
-
 
         response.setOrderItems(items);
 
@@ -96,16 +94,27 @@ public class OrderServiceImpl implements OrderService {
         return summary;
     }
 
+    // --- Helpers ---
+    private User currentUser() {
+
+        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
     @Override
     @Transactional
     public OrderResponse placeOrder(OrderRequest orderRequest) {
 
+        // get current user
+        User currentUser = currentUser();
+
         // to add to a cart we 1st get the cart
-        Cart cart = cartRepository.findById(orderRequest.getCartId())
-                .orElseThrow(() -> new CartNotFoundException("Cart with ID " + orderRequest.getCartId() + " not found"));
+        Cart cart = currentUser.getCart();
 
         if (cart.getCartItems().isEmpty()) {
-            throw new IllegalStateException("Cannot place an order with an empty cart.");
+            throw new ActionNotAllowedException("Cannot place an order with an empty cart.");
         }
 
         // now we check the inventory
@@ -130,6 +139,7 @@ public class OrderServiceImpl implements OrderService {
 
         // now we make a new order
         Order order = new Order();
+        order.setUser(currentUser);
         order.setOrderDateAndTime(LocalDateTime.now());
         order.setTotalAmount(cart.getTotalAmount());
         order.setShippingAddress(orderRequest.getShippingAddress());
@@ -157,27 +167,52 @@ public class OrderServiceImpl implements OrderService {
         Order savedOrder = orderRepository.save(order);
 
         // now we clear user's cart
-        cartService.clearCart(orderRequest.getCartId());
+        cartService.clearCart();
 
         return mapToResponse(savedOrder);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public OrderResponse getOrderById(Long orderId) {
+
+        User currentUser = currentUser();
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order with ID " + orderId + " not found"));
 
+        if (!order.getUser().getId().equals(currentUser.getId())) {
+
+            throw new ResourceAccessDeniedException("You cannot view this order.");
+        }
+
         return mapToResponse(order);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getMyOrder() {
+
+        User currentUser = currentUser();
+
+        return currentUser.getOrders().stream()
+                .map(order -> mapToResponse(order))
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public OrderResponse cancelOrder(Long orderId) {
 
-        // 1st we check if it exists or not
+        User currentUser = currentUser();
+
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order with ID " + orderId + " not found"));
+
+        if (!order.getUser().getId().equals(currentUser.getId())) {
+
+            throw new ActionNotAllowedException("You cannot cancel this order.");
+        }
 
         // now we check if order status is beyond processing then it's not possible
         if (Set.of(
@@ -188,7 +223,7 @@ public class OrderServiceImpl implements OrderService {
                     OrderStatus.CANCELLED
                 ).contains(order.getOrderStatus())) {
 
-            throw new IllegalStateException("Order cannot be cancelled because it is already " + order.getOrderStatus());
+            throw new ActionNotAllowedException("Order cannot be cancelled because it is already " + order.getOrderStatus());
         }
 
         // now we restock

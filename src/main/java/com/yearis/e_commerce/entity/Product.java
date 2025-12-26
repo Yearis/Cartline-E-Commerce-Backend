@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -42,6 +41,9 @@ public class Product {
     @Column(name = "inventory")
     @Min(0)
     private int inventory; // quantity
+
+    @Version
+    private Long version;
 
     // Relationships
 

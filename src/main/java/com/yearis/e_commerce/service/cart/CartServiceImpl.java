@@ -3,8 +3,9 @@ package com.yearis.e_commerce.service.cart;
 import com.yearis.e_commerce.entity.Cart;
 import com.yearis.e_commerce.entity.CartItem;
 import com.yearis.e_commerce.entity.Product;
+import com.yearis.e_commerce.entity.User;
 import com.yearis.e_commerce.exception.CartItemNotFoundException;
-import com.yearis.e_commerce.exception.CartNotFoundException;
+import com.yearis.e_commerce.exception.InventoryException;
 import com.yearis.e_commerce.exception.ProductNotFoundException;
 import com.yearis.e_commerce.payload.cart.CartResponse;
 import com.yearis.e_commerce.payload.cartitem.CartItemRequest;
@@ -12,12 +13,16 @@ import com.yearis.e_commerce.payload.cartitem.CartItemResponse;
 import com.yearis.e_commerce.payload.product.ProductResponseSummary;
 import com.yearis.e_commerce.repository.cart.CartRepository;
 import com.yearis.e_commerce.repository.product.ProductRepository;
+import com.yearis.e_commerce.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,6 +34,7 @@ public class CartServiceImpl implements CartService {
 
     private final ProductRepository productRepository;
     private final CartRepository cartRepository;
+    private final UserRepository userRepository;
 
     // --- Mappers ---
 
@@ -85,6 +91,15 @@ public class CartServiceImpl implements CartService {
     }
 
     // --- Helper ---
+
+    private User currentUser() {
+
+        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
     private void calculateCartTotal(Cart cart) {
         // no we recalculate the total price of the cart
         BigDecimal totalCartAmount = cart.getCartItems().stream()
@@ -111,11 +126,13 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public CartResponse addToCart(Long cartId, CartItemRequest cartItem) {
+    public CartResponse addToCart(CartItemRequest cartItem) {
 
-        // to add to a cart we 1st get the cart
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new CartNotFoundException("Cart with ID " + cartId + " not found"));
+        // 1st we get our current user
+        User currentUser = currentUser();
+
+        // now we can directly get the cart rather than using repository for it
+        Cart userCart = currentUser.getCart();
 
         // we need to check if the product to be added exists or not
         Product product = productRepository.findById(cartItem.getProductId())
@@ -124,13 +141,13 @@ public class CartServiceImpl implements CartService {
         // now we check if the product's inventory has sufficient stock or not
         if (product.getInventory() < cartItem.getQuantity()) {
 
-            throw new RuntimeException("Not enough inventory!!\nAvailable Stock: " + product.getInventory());
+            throw new InventoryException("Not enough inventory!!\nAvailable Stock: " + product.getInventory());
         }
 
         // now we check if the product is already in the cart or not
         // if it is we just increase the quantity in cart
         // we use optional as we don't know if it exists or not
-        Optional<CartItem> existingItem = cart.getCartItems().stream()
+        Optional<CartItem> existingItem = userCart.getCartItems().stream()
                 .filter(item -> item.getProduct().getId().equals(product.getId()))
                 .findAny();
 
@@ -143,7 +160,7 @@ public class CartServiceImpl implements CartService {
             // now we check if it doesn't exceed inventory
             if (newQuantity > product.getInventory()) {
 
-                throw new RuntimeException("Cant add more!!\nAvailable Stock: " + product.getInventory());
+                throw new InventoryException("Cant add more!!\nAvailable Stock: " + product.getInventory());
             }
 
             existingItem.get().setQuantity(newQuantity);
@@ -152,41 +169,45 @@ public class CartServiceImpl implements CartService {
             // if it's not present we add it to cart
             CartItem newItem = new CartItem();
             newItem.setProduct(product);
-            newItem.setCart(cart);
+            newItem.setCart(userCart);
             newItem.setQuantity(cartItem.getQuantity());
             newItem.setUnitPrice(calculateDiscountedPrice(product));
             newItem.setTotalPrice();
 
-            cart.getCartItems().add(newItem);
+            userCart.getCartItems().add(newItem);
         }
 
         // now we update the cart total
-        calculateCartTotal(cart);
+        calculateCartTotal(userCart);
 
         // now we save
-        Cart savedCart = cartRepository.save(cart);
+        Cart savedCart = cartRepository.save(userCart);
 
         return mapToResponse(savedCart);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public CartResponse getCart(Long id) {
+    public CartResponse getCart() {
 
-        // 1st we check if cart exists or not
-        Cart cart = cartRepository.findById(id)
-                .orElseThrow(() -> new CartNotFoundException("Cart with ID " + id + " not found"));
+        // get the current user
+        User currentUser = currentUser();
+
+        // we can now directly get the cart
+        Cart cart = currentUser.getCart();
 
         return mapToResponse(cart);
     }
 
     @Override
     @Transactional
-    public CartResponse decreaseItemQuantity(Long cartId, Long cartItemId) {
+    public CartResponse decreaseItemQuantity(Long cartItemId) {
+
+        // get the current user
+        User currentUser = currentUser();
 
         // 1st we check if cart exists or not
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new CartNotFoundException("Cart with ID " + cartId + " not found"));
+        Cart cart = currentUser.getCart();
 
         // then we check if the item we want to remove is present in the cart or not
         CartItem existingItem = cart.getCartItems().stream()
@@ -195,7 +216,8 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new CartItemNotFoundException("Item with ID " + cartItemId + " not found in cart"));
 
         if (existingItem.getQuantity() <= 1) {
-            removeItemFromCart(cartId, cartItemId);
+
+            return removeItemFromCart(cartItemId);
         }
 
         int newQuantity = existingItem.getQuantity() - 1;
@@ -214,11 +236,13 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public CartResponse removeItemFromCart(Long cartId, Long cartItemId) {
+    public CartResponse removeItemFromCart(Long cartItemId) {
+
+        // get the current user
+        User currentUser = currentUser();
 
         // 1st we check if cart exists or not
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new CartNotFoundException("Cart with ID " + cartId + " not found"));
+        Cart cart = currentUser.getCart();
 
         // then we check if the item we want to remove is present in the cart or not
         CartItem existingItem = cart.getCartItems().stream()
@@ -239,11 +263,13 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public CartResponse clearCart(Long id) {
+    public CartResponse clearCart() {
+
+        // get the current user
+        User currentUser = currentUser();
 
         // 1st we check if cart exists or not
-        Cart cart = cartRepository.findById(id)
-                .orElseThrow(() -> new CartNotFoundException("Cart with ID " + id + " not found"));
+        Cart cart = currentUser.getCart();
 
         // we remove everything from list
         cart.getCartItems().clear();

@@ -1,19 +1,18 @@
 package com.yearis.e_commerce.service.user;
 
 import com.yearis.e_commerce.entity.User;
+import com.yearis.e_commerce.exception.InvalidPasswordException;
 import com.yearis.e_commerce.payload.user.PasswordChangeRequest;
 import com.yearis.e_commerce.payload.user.UserDeleteRequest;
 import com.yearis.e_commerce.payload.user.UserResponse;
 import com.yearis.e_commerce.payload.user.UserUpdateRequest;
 import com.yearis.e_commerce.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Objects;
 import java.util.Set;
@@ -102,18 +101,18 @@ public class UserServiceImpl implements UserService {
         // now we check if newPassword and confirmedNewPassword match or not
         if (!request.getNewPassword().equals(request.getConfirmationNewPassword())) {
 
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "New password and Confirmed new password fields should match");
+            throw new InvalidPasswordException("New password and Confirm New password fields should match");
         }
 
         // now we check if our old password is correct and our new password doesn't match our old password
         if (!passwordEncoder.matches(request.getCurrentPassword(), currentUser.getPassword())) {
 
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Current password is incorrect");
+            throw new InvalidPasswordException("Current password is incorrect");
         }
 
         if (passwordEncoder.matches(request.getNewPassword(), currentUser.getPassword())) {
 
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "New password cannot be same as old password");
+            throw new InvalidPasswordException("New password cannot be same as old password");
         }
 
         // now we set the password
@@ -126,20 +125,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public String deleteUser(UserDeleteRequest request) {
 
         // we get the current user as only you are able to delete your own acc
         User currentUser = currentUser();
 
-        // we first check if the current user is the one deleting the acc
-        if (!currentUser.getEmail().equals(request.getEmail())) {
-
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You cannot delete someone else's account!!");
-        }
-
         if (!passwordEncoder.matches(request.getUserPassword(), currentUser.getPassword())) {
 
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid Password");
+            throw new InvalidPasswordException("Invalid Password");
         }
 
         // if everything's alright we delete it now

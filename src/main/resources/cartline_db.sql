@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS products (
     description TEXT NOT NULL,
     price DECIMAL(13, 2) NOT NULL,
     discount DECIMAL(13, 2), -- This can be null lol
-    inventory INT UNSIGNED    
+    inventory INT UNSIGNED,
+    version BIGINT DEFAULT 0
 )AUTO_INCREMENT = 10001;
 
 CREATE TABLE IF NOT EXISTS categories(

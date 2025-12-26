@@ -6,13 +6,13 @@ import com.yearis.e_commerce.payload.cartitem.CartItemRequest;
 public interface CartService {
 
     // this will be used for both adding and updating cart
-    CartResponse addToCart(Long cartId, CartItemRequest cartItem);
+    CartResponse addToCart(CartItemRequest cartItem);
 
-    CartResponse getCart(Long id);
+    CartResponse getCart();
 
-    CartResponse decreaseItemQuantity(Long cartId, Long cartItemId);
+    CartResponse decreaseItemQuantity(Long cartItemId);
 
-    CartResponse removeItemFromCart(Long cartId, Long cartItemId);
+    CartResponse removeItemFromCart(Long cartItemId);
 
-    CartResponse clearCart(Long id);
+    CartResponse clearCart();
 }

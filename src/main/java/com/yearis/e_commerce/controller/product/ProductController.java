@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class ProductController {
     private final ProductService productService;
 
     @Operation(summary = "Add a new product", description = "Add a new product to database")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @PostMapping("/create")
     public ResponseEntity<ProductResponse> addProduct(
             @Parameter(description = "payload for create product") @Valid @RequestBody ProductRequest productRequest) {
@@ -130,6 +132,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Update a product", description = "Update existing product in database")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponse> updateProductById(
             @Parameter(description = "payload for updated product") @Valid @RequestBody ProductRequest productRequest,
@@ -141,6 +144,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Delete a product", description = "Delete an existing product")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProductById(
             @Parameter(description = "ID of product to delete") @PathVariable Long id) {

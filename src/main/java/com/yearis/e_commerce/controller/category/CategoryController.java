@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @Operation(summary = "Create a new category", description = "Add a new category to database")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/create")
     public ResponseEntity<CategoryResponse> addCategory(
             @Parameter(description = "payload to create category") @Valid @RequestBody CategoryRequest request) {
@@ -66,6 +68,7 @@ public class CategoryController {
     }
 
     @Operation(summary = "Update a category", description = "Update the details of an existing category")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponse> updateCategory(
             @Parameter(description = "payload for updated category") @Valid @RequestBody CategoryRequest request,
@@ -77,6 +80,7 @@ public class CategoryController {
     }
 
     @Operation(summary = "Delete a category", description = "Delete an existing category")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCategoryById(
             @Parameter(description = "ID of category to delete") @PathVariable Long id) {
