@@ -20,10 +20,10 @@ public class ProductRequest {
 
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.0", inclusive = false, message = "Price must be greater than zero")
-    @DecimalMax(value = "90.0", message = "Discount cannot exceed 90%")
     private BigDecimal price;
 
     @DecimalMin(value = "0.0", message = "Discount cannot be negative")
+    @DecimalMax(value = "90.0", message = "Discount cannot exceed 90%")
     private BigDecimal discount;
 
     @Min(value = 0, message = "Inventory cannot be negative")

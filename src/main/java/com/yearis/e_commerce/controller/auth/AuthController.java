@@ -34,6 +34,7 @@ public class AuthController {
     }
 
     @Operation(summary = "Login a user", description = "Login an existing user")
+    @PostMapping("/login")
     public ResponseEntity<JwtAuthResponse> login(
             @Parameter(description = "payload for logging in") @RequestBody LoginRequest request) {
 

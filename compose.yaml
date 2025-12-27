@@ -8,6 +8,7 @@ services:
   mysql:
     image: 'mysql:8.0'
     container_name: mysql_e_commerce_db_container
+    env_file: .env
     # we set our credentials
     environment:
       MYSQL_DATABASE: ${MYSQL_DB}
