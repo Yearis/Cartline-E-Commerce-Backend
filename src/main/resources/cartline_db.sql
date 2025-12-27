@@ -1,6 +1,5 @@
 USE cartline_db;
 
-
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
@@ -76,7 +75,13 @@ CREATE TABLE IF NOT EXISTS orders (
     order_date_time DATETIME NOT NULL,
     total_amount DECIMAL(13, 2) NOT NULL,
     order_status VARCHAR(255) NOT NULL ,
-    shipping_address VARCHAR(255) NOT NULL,
+    shipping_address_line1 VARCHAR(255) NOT NULL,
+    shipping_address_line2 VARCHAR(255) NOT NULL,
+    shipping_landmark VARCHAR(255) NOT NULL,
+    shipping_city VARCHAR(255) NOT NULL,
+    shipping_state VARCHAR(255) NOT NULL,
+    shipping_country VARCHAR(255) NOT NULL,
+    shipping_zip_code VARCHAR(255) NOT NULL,
     user_id BIGINT NOT NULL,
 
     FOREIGN KEY (user_id)

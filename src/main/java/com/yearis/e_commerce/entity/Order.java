@@ -36,11 +36,19 @@ public class Order {
     @Column(name = "order_status", nullable = false)
     private OrderStatus orderStatus;
 
-    @Column(name = "shipping_address", nullable = false)
-    private String shippingAddress;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "addressLine1", column = @Column(name = "shipping_address_line1", nullable = false)),
+            @AttributeOverride(name = "addressLine2", column = @Column(name = "shipping_address_line2")),
+            @AttributeOverride(name = "landmark", column = @Column(name = "shipping_landmark")),
+            @AttributeOverride(name = "city", column = @Column(name = "shipping_city", nullable = false)),
+            @AttributeOverride(name = "state", column = @Column(name = "shipping_state", nullable = false)),
+            @AttributeOverride(name = "country", column = @Column(name = "shipping_country", nullable = false)),
+            @AttributeOverride(name = "zipCode", column = @Column(name = "shipping_zip_code", nullable = false))
+    })
+    private Address shippingAddress;
 
     // Relationships:
-
 
     // Many orders -> 1 user
     @ManyToOne

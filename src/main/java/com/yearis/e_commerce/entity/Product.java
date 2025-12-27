@@ -1,5 +1,6 @@
 package com.yearis.e_commerce.entity;
 
+import com.yearis.e_commerce.enums.ProductStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
@@ -45,8 +46,12 @@ public class Product {
     @Version
     private Long version;
 
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status = ProductStatus.ACTIVE;
+
     // Relationships
 
+    // Many categories -> 1 product
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
         name = "products_categories",
@@ -55,4 +60,8 @@ public class Product {
     )
     private Set<Category> categories;
 
+    // Many products -> 1 seller
+    @ManyToOne
+    @JoinColumn(name = "seller_id")
+    private Seller seller;
 }

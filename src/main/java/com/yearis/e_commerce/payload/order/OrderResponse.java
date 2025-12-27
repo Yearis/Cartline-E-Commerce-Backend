@@ -1,5 +1,6 @@
 package com.yearis.e_commerce.payload.order;
 
+import com.yearis.e_commerce.entity.Address;
 import com.yearis.e_commerce.enums.OrderStatus;
 import com.yearis.e_commerce.payload.orderitem.OrderItemResponse;
 import lombok.Data;
@@ -19,7 +20,7 @@ public class OrderResponse {
 
     private OrderStatus orderStatus;
 
-    private String shippingAddress;
+    private Address shippingAddress;
 
     private Set<OrderItemResponse> orderItems;
 }
