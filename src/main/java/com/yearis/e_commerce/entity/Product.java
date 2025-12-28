@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -64,4 +65,20 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "seller_id")
     private Seller seller;
+
+    // 1 product -> many reviews
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("rating DESC")
+    Set<ProductionReview> reviews = new HashSet<>();
+
+    public Double getAverageRating() {
+
+        if (reviews == null || reviews.isEmpty()) {
+            return 0.0;
+        }
+        return reviews.stream()
+                .mapToDouble(productionReview -> productionReview.getRating())
+                .average()
+                .orElse(0.0);
+    }
 }

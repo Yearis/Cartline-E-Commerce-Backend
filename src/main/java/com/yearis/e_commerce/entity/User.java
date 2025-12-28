@@ -57,4 +57,12 @@ public class User {
     // 1 user -> 1 seller
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Seller seller;
+
+    // 1 user -> many seller review
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SellerReview> sellerReviews = new ArrayList<>();
+
+    // 1 user -> many product review
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductionReview> productionReviews = new ArrayList<>();
 }

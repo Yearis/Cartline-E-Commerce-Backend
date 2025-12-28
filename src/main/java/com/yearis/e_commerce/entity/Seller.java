@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -14,13 +15,17 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@Table(name = "sellers")
 public class Seller {
 
     @Id
+    @Column(name = "user_id")
     private Long id;
 
+    @Column(name = "store_name", nullable = false, unique = true)
     private String storeName;
 
+    @Column(name = "business_phone_number", nullable = false, unique = true)
     private String businessPhoneNumber;
 
     @Embedded
@@ -35,6 +40,7 @@ public class Seller {
     })
     private Address address;
 
+    @Column(name = "seller_status")
     private SellerStatus sellerStatus;
 
     // Relationships:
@@ -47,5 +53,20 @@ public class Seller {
 
     // 1 seller -> many products
     @OneToMany(mappedBy = "seller", fetch = FetchType.LAZY)
-    private Set<Product> products;
+    private Set<Product> products = new HashSet<>();
+
+    // 1 seller -> many reviews
+    @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("overallRating DESC")
+    Set<SellerReview> reviews = new HashSet<>();
+
+    public Double getAverageRating() {
+        if (reviews == null || reviews.isEmpty()) {
+            return 0.0;
+        }
+        return reviews.stream()
+                .mapToDouble(sellerReview -> sellerReview.getOverallRating())
+                .average()
+                .orElse(0.0);
+    }
 }
