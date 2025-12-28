@@ -40,8 +40,12 @@ public class Seller {
     })
     private Address address;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "seller_status")
     private SellerStatus sellerStatus;
+
+    @Column(name = "average_rating")
+    private Double averageRating;
 
     // Relationships:
 
@@ -60,11 +64,12 @@ public class Seller {
     @OrderBy("overallRating DESC")
     Set<SellerReview> reviews = new HashSet<>();
 
-    public Double getAverageRating() {
+    public void calculateAverageRating() {
         if (reviews == null || reviews.isEmpty()) {
-            return 0.0;
+            this.averageRating = 0.0;
+            return;
         }
-        return reviews.stream()
+        this.averageRating = reviews.stream()
                 .mapToDouble(sellerReview -> sellerReview.getOverallRating())
                 .average()
                 .orElse(0.0);

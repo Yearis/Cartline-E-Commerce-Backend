@@ -19,8 +19,9 @@ public class GlobalExceptionHandler {
             OrderNotFoundException.class,
             CategoryNotFoundException.class,
             CartItemNotFoundException.class,
-            RoleNotFoundException.class,     // Added from your list
-            UsernameNotFoundException.class  // Built-in Spring Security exception
+            RoleNotFoundException.class,
+            SellerNotFoundException.class,
+            UsernameNotFoundException.class
     })
     public ResponseEntity<ErrorResponse> handleResourceNotFound(RuntimeException ex) {
 
@@ -43,7 +44,10 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.FORBIDDEN, "Access Denied", ex.getMessage());
     }
 
-    @ExceptionHandler(UserAlreadyExistsException.class)
+    @ExceptionHandler({
+        UserAlreadyExistsException.class,
+        ResourceAlreadyExistsException.class
+    })
     public ResponseEntity<ErrorResponse> handleConflict(RuntimeException ex) {
 
         return buildResponse(HttpStatus.CONFLICT, "Resource Conflict", ex.getMessage());

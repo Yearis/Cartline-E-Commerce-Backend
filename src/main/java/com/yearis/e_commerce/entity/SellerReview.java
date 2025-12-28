@@ -28,22 +28,22 @@ public class SellerReview {
 
     @Min(0)
     @Max(5)
-    @Column(name = "delivery_rating")
+    @Column(name = "delivery_rating", nullable = false)
     private Integer deliveryRating;
 
     @Min(0)
     @Max(5)
-    @Column(name = "product_accuracy_rating")
+    @Column(name = "product_accuracy_rating", nullable = false)
     private Integer productAccuracyRating;
 
     @Min(0)
     @Max(5)
-    @Column(name = "service_rating")
+    @Column(name = "service_rating", nullable = false)
     private Integer serviceRating;
 
     @Min(0)
     @Max(5)
-    @Column(name = "packaging_rating")
+    @Column(name = "packaging_rating", nullable = false)
     private Integer packagingRating;
 
     // Relationships:
@@ -58,9 +58,16 @@ public class SellerReview {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @PrePersist
+    @PreUpdate
     public void calculateOverallRating() {
 
-        double sum = deliveryRating + productAccuracyRating + serviceRating + packagingRating;
+        int d = (deliveryRating == null) ? 0 : deliveryRating;
+        int p = (productAccuracyRating == null) ? 0 : productAccuracyRating;
+        int s = (serviceRating == null) ? 0 : serviceRating;
+        int pack = (packagingRating == null) ? 0 : packagingRating;
+
+        double sum = d + p + s + pack;
         this.overallRating = sum / 4.0;
     }
 }

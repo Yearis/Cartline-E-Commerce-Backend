@@ -12,24 +12,34 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    Page<Product> findByCategoriesNameIgnoreCase(String category, Pageable pageable);
+    Page<Product> findByCategoriesNameIgnoreCaseAndStatus(String category, ProductStatus status, Pageable pageable);
 
-    Page<Product> findByBrand(String brand, Pageable pageable);
+    Page<Product> findByBrandAndStatus(String brand, ProductStatus status, Pageable pageable);
 
-    Page<Product> findByCategoriesNameIgnoreCaseAndBrand(String category, String brand, Pageable pageable);
+    Page<Product> findByCategoriesNameIgnoreCaseAndBrandAndStatus(String category, String brand, ProductStatus status, Pageable pageable);
 
-    Page<Product> findByNameContaining(String name, Pageable pageable);
+    Page<Product> findByNameContainingAndStatus(String name, ProductStatus status, Pageable pageable);
 
-    Page<Product> findByBrandAndNameContaining(String brand, String name, Pageable pageable);
+    Page<Product> findByBrandAndNameContainingAndStatus(String brand, String name, ProductStatus status, Pageable pageable);
 
-    Page<Product> findByCategoriesNameIgnoreCaseAndNameContaining(String category, String name, Pageable pageable);
+    Page<Product> findByCategoriesNameIgnoreCaseAndNameContainingAndStatus(String category, String name, ProductStatus status, Pageable pageable);
 
-    Long countByBrandAndNameContaining(String brand, String name);
+    Long countByBrandAndNameContainingAndStatus(String brand, String name, ProductStatus status);
 
-    Long countByCategoriesNameIgnoreCaseAndNameContaining(String category, String name);
+    Long countByCategoriesNameIgnoreCaseAndNameContainingAndStatus(String categories_name, String name, ProductStatus status);
 
-    Long countByCategoriesNameIgnoreCaseAndBrand(String category, String brand);
+    Long countByCategoriesNameIgnoreCaseAndBrandAndStatus(String categories_name, String brand, ProductStatus status);
 
     List<Product> findByStatus(ProductStatus status);
+
+    Page<Product> findProductBySellerIdAndStatus(Long sellerId, ProductStatus status, Pageable pageable);
+
+    Page<Product> findAllByStatus(ProductStatus status, Pageable pageable);
+
+    Page<Product> findBySellerIdAndCategoriesNameIgnoreCaseAndStatus(Long sellerId, String category, ProductStatus status, Pageable pageable);
+
+    Page<Product> findBySellerIdAndBrandAndStatus(Long sellerId, String brand, ProductStatus status, Pageable pageable);
+
+    Page<Product> findBySellerIdAndNameContainingAndStatus(Long sellerId, String name, ProductStatus status, Pageable pageable);
 }
 

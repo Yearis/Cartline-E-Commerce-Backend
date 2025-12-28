@@ -47,6 +47,9 @@ public class Product {
     @Version
     private Long version;
 
+    @Column(name = "average_rating")
+    private Double averageRating;
+
     @Enumerated(EnumType.STRING)
     private ProductStatus status = ProductStatus.ACTIVE;
 
@@ -69,15 +72,16 @@ public class Product {
     // 1 product -> many reviews
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("rating DESC")
-    Set<ProductionReview> reviews = new HashSet<>();
+    Set<ProductReview> reviews = new HashSet<>();
 
-    public Double getAverageRating() {
+    public void calculateAverageRating() {
 
         if (reviews == null || reviews.isEmpty()) {
-            return 0.0;
+            this.averageRating = 0.0;
+            return;
         }
-        return reviews.stream()
-                .mapToDouble(productionReview -> productionReview.getRating())
+        this.averageRating = reviews.stream()
+                .mapToDouble(productReview -> productReview.getRating())
                 .average()
                 .orElse(0.0);
     }

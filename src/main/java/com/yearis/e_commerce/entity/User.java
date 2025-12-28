@@ -36,6 +36,9 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "is_deleted")
+    private boolean isDeleted = false;
+
     // Relationships:
 
     // 1 user -> 1 cart
@@ -64,5 +67,5 @@ public class User {
 
     // 1 user -> many product review
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductionReview> productionReviews = new ArrayList<>();
+    private List<ProductReview> productReviews = new ArrayList<>();
 }

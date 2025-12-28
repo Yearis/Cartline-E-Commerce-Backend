@@ -1,5 +1,7 @@
 package com.yearis.e_commerce.payload.product;
 
+import com.yearis.e_commerce.entity.Seller;
+import com.yearis.e_commerce.enums.ProductStatus;
 import com.yearis.e_commerce.payload.category.CategoryResponse;
 import lombok.Data;
 
@@ -25,5 +27,9 @@ public class ProductResponse {
 
     private int inventory;
 
+    private ProductStatus status;
+
     private List<CategoryResponse> category;
+
+    private Seller seller;
 }

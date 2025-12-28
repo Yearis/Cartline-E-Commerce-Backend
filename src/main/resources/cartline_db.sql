@@ -31,10 +31,10 @@ CREATE TABLE IF NOT EXISTS users_roles (
 CREATE TABLE IF NOT EXISTS sellers (
 	user_id BIGINT NOT NULL PRIMARY KEY,
     store_name VARCHAR(255) NOT NULL UNIQUE,
-    business_phone_number VARCHAR(255),
+    business_phone_number VARCHAR(255) UNIQUE,
     seller_status VARCHAR(50),
     
-    business_address_line1 VARCHAR(255) NOT NULL,
+    business_address_line1 VARCHAR(255) NOT NULL UNIQUE,
     business_address_line2 VARCHAR(255),
     business_landmark VARCHAR(255),
     business_city VARCHAR(255) NOT NULL,

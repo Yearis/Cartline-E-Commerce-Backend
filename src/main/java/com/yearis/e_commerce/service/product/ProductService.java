@@ -39,4 +39,12 @@ public interface ProductService {
     Long countProductByCategoryAndName(String category, String name);
 
     Long countProductByCategoryAndBrand(String category, String brand);
+
+    List<ProductResponseSummary> getAllProductsBySeller(Long sellerId, int pageNo, int pageSize);
+
+    List<ProductResponseSummary> getBySellerIdAndCategoriesNameIgnoreCaseAndStatus(Long sellerId, String category, int pageNo, int pageSize);
+
+    List<ProductResponseSummary> getBySellerIdAndBrandAndStatus(Long sellerId, String brand, int pageNo, int pageSize);
+
+    List<ProductResponseSummary> getBySellerIdAndNameContainingAndStatus(Long sellerId, String name, int pageNo, int pageSize);
 }

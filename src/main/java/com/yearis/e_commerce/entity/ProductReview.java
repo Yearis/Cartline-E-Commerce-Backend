@@ -15,7 +15,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "product_reviews")
-public class ProductionReview {
+public class ProductReview {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,11 +28,11 @@ public class ProductionReview {
     private Integer rating;
 
     @Size(min = 2, max = 500, message = "Comment must be between 2 and 500")
-    @Column(comment = "comment")
+    @Column(name = "comment", nullable = false)
     private String comment;
 
     @Column(name = "helpful_counter")
-    private Long helpfulCounter;
+    private Long helpfulCounter = 0L;
 
     @Column(name = "verified_purchase")
     private Boolean verifiedPurchase = false;

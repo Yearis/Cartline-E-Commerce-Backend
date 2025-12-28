@@ -7,6 +7,7 @@ import com.yearis.e_commerce.payload.user.UserDeleteRequest;
 import com.yearis.e_commerce.payload.user.UserResponse;
 import com.yearis.e_commerce.payload.user.UserUpdateRequest;
 import com.yearis.e_commerce.repository.user.UserRepository;
+import com.yearis.e_commerce.service.seller.SellerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,6 +26,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SellerService sellerService;
 
     // get our current user
     private User currentUser() {
@@ -136,8 +138,25 @@ public class UserServiceImpl implements UserService {
             throw new InvalidPasswordException("Invalid Password");
         }
 
+        // if user is a seller we don't delete the account
+        if (currentUser.getSeller() != null) {
+
+            sellerService.deactivateSellerAccount();
+        }
+
+        currentUser.setFirstName("Deleted");
+        currentUser.setLastName("User");
+
+        String uniqueDeletedEmail = "deleted_" + currentUser.getId() + "@cartline.com";
+        currentUser.setEmail(uniqueDeletedEmail);
+
+        currentUser.setPassword("");
+        currentUser.setDeleted(true);
+
+        currentUser.getRoles().clear();
+
         // if everything's alright we delete it now
-        userRepository.delete(currentUser);
+        userRepository.save(currentUser);
 
         return "User Successfully Deleted!";
     }
