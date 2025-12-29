@@ -21,6 +21,8 @@ public class ProductResponseSummary {
 
     private BigDecimal discountedPrice;
 
+    private Double averageRating;
+
     private ProductStatus status;
 
     private Seller seller;

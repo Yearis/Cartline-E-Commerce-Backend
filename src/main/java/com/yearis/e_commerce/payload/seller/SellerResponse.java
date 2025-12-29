@@ -7,6 +7,8 @@ import lombok.Data;
 @Data
 public class SellerResponse {
 
+    private Long id;
+
     private String storeName;
 
     private SellerStatus sellerStatus;

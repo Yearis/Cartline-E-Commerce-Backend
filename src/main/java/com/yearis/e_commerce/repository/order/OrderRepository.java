@@ -16,4 +16,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Modifying
     @Query("UPDATE Order o SET o.orderStatus = :newStatus WHERE o.orderStatus = :oldStatus AND o.orderDateAndTime < :cutoffDateAndTime")
     int updateStatusForOldOrders(OrderStatus newStatus, OrderStatus oldStatus, LocalDateTime cutoffDateAndTime);
+
+    @Query("SELECT COUNT(o) > 0 FROM Order o JOIN o.orderItems oi WHERE o.user.id = :userId AND oi.product.id = :productId")
+    boolean existsByUserIdAndProductId(Long userId, Long productId);
 }

@@ -49,6 +49,7 @@ public class SellerServiceImpl implements SellerService {
     private SellerResponse mapToResponse(Seller seller) {
 
         SellerResponse response = new SellerResponse();
+        response.setId(seller.getId());
         response.setStoreName(seller.getStoreName());
         response.setBusinessPhoneNumber(seller.getBusinessPhoneNumber());
         response.setEmail(seller.getUser().getEmail());
@@ -77,48 +78,40 @@ public class SellerServiceImpl implements SellerService {
 
         User currentUser = currentUser();
 
-        Seller seller = mapToEntity(sellerRequest);
-
         // we check if they already have a store which is not closed
-        if (sellerRepository.existsById(currentUser.getId())) {
+        sellerRepository.findById(currentUser.getId()).ifPresent(existingSeller -> {
+            SellerStatus status = existingSeller.getSellerStatus();
 
-            if (seller.getSellerStatus() == SellerStatus.PENDING) {
-
-                // means their seller account is not closed so they can't re-apply
-                throw new ActionNotAllowedException("Your seller account is under verification by Admin.\nPlease wait for result.");
+            if (status == SellerStatus.PENDING) {
+                throw new ActionNotAllowedException("Your seller account is under verification. Please wait.");
             }
-
-            if (seller.getSellerStatus() == SellerStatus.APPROVED) {
-
-                // means their seller account is not closed so they can't re-apply
-                throw new ResourceAlreadyExistsException("You already have a seller account");
+            if (status == SellerStatus.APPROVED) {
+                throw new ResourceAlreadyExistsException("You already have an active seller account.");
             }
-
-            if (seller.getSellerStatus() == SellerStatus.BANNED) {
-
-                throw new ActionNotAllowedException("Your seller account has been banned due to misconduct.\nContact Admin.");
+            if (status == SellerStatus.BANNED) {
+                throw new ActionNotAllowedException("Your account is banned. Contact Admin.");
             }
-
-            // if status is REJECTED or CLOSED then they can re-apply
-        }
-
+            // If REJECTED or CLOSED, they can re-apply
+        });
         // now we check if store name is already taken
-        if (sellerRepository.existsByStoreName(seller.getStoreName())) {
+        if (sellerRepository.existsByStoreName(sellerRequest.getStoreName())) {
 
             throw new ResourceAlreadyExistsException("Store name '" + sellerRequest.getStoreName() + "' is already taken.");
         }
 
         // now we check if phone number is already taken
-        if (sellerRepository.existsByBusinessPhoneNumber(seller.getBusinessPhoneNumber())) {
+        if (sellerRepository.existsByBusinessPhoneNumber(sellerRequest.getBusinessPhoneNumber())) {
 
             throw new ResourceAlreadyExistsException("Cannot use this phone number.");
         }
 
         // now we check if address is already taken
-        if (sellerRepository.existsByAddress(seller.getAddress())) {
+        if (sellerRepository.existsByAddress(sellerRequest.getBusinessAddress())) {
 
             throw new ResourceAlreadyExistsException("Cannot use this business address");
         }
+
+        Seller seller = mapToEntity(sellerRequest);
 
         Seller savedSeller = sellerRepository.save(seller);
 
@@ -155,18 +148,21 @@ public class SellerServiceImpl implements SellerService {
         // here we will only update what is sent in the request
         User currentUser = currentUser();
 
-        if (currentUser.getSeller() == null) {
+        Seller seller = currentUser.getSeller();
+
+        if (seller == null) {
             throw new SellerNotFoundException("Current user does not have a seller account.");
         }
-
-        Seller seller = sellerRepository.findById(currentUser.getSeller().getId())
-                .orElseThrow(() -> new UsernameNotFoundException("Seller not found"));
 
         boolean isUpdated = false;
 
         if (sellerUpdateRequest.getStoreName() != null && !sellerUpdateRequest.getStoreName().isBlank()) {
 
             if (!sellerUpdateRequest.getStoreName().equals(seller.getStoreName())) {
+
+                if (sellerRepository.existsByStoreName(sellerUpdateRequest.getStoreName())) {
+                    throw new ResourceAlreadyExistsException("Store name already taken.");
+                }
                 seller.setStoreName(sellerUpdateRequest.getStoreName());
                 isUpdated = true;
             }
@@ -183,6 +179,9 @@ public class SellerServiceImpl implements SellerService {
         if (sellerUpdateRequest.getBusinessPhoneNumber() != null && !sellerUpdateRequest.getBusinessPhoneNumber().isBlank()) {
 
             if (!sellerUpdateRequest.getBusinessPhoneNumber().equals(seller.getBusinessPhoneNumber())) {
+                if (sellerRepository.existsByBusinessPhoneNumber(sellerUpdateRequest.getBusinessPhoneNumber())) {
+                    throw new ResourceAlreadyExistsException("Cannot use this number.");
+                }
                 seller.setBusinessPhoneNumber(sellerUpdateRequest.getBusinessPhoneNumber());
                 isUpdated = true;
             }
@@ -201,13 +200,11 @@ public class SellerServiceImpl implements SellerService {
     public void deactivateSellerAccount() {
 
         User currentUser = currentUser();
+        Seller seller = currentUser.getSeller();
 
         if (currentUser.getSeller() == null) {
             throw new SellerNotFoundException("Current user does not have a seller account.");
         }
-
-        Seller seller = sellerRepository.findById(currentUser.getSeller().getId())
-                .orElseThrow(() -> new UsernameNotFoundException("Seller not found"));
 
         // 1st we set the seller as CLOSED
         seller.setSellerStatus(SellerStatus.CLOSED);

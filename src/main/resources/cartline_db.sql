@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS users (
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL
+    password VARCHAR(255) NOT NULL,
+    is_deleted TINYINT(1) DEFAULT 0
 ) AUTO_INCREMENT = 10001;
 
 CREATE TABLE IF NOT EXISTS roles (
@@ -34,13 +35,15 @@ CREATE TABLE IF NOT EXISTS sellers (
     business_phone_number VARCHAR(255) UNIQUE,
     seller_status VARCHAR(50),
     
-    business_address_line1 VARCHAR(255) NOT NULL UNIQUE,
+    business_address_line1 VARCHAR(255) NOT NULL,
     business_address_line2 VARCHAR(255),
     business_landmark VARCHAR(255),
     business_city VARCHAR(255) NOT NULL,
     business_state VARCHAR(255) NOT NULL,
     business_country VARCHAR(255) NOT NULL,
     business_zip_code VARCHAR(255) NOT NULL,
+    
+    average_rating DOUBLE DEFAULT 0.0,
     
     FOREIGN KEY (user_id)
     REFERENCES users(id)
@@ -78,6 +81,7 @@ CREATE TABLE IF NOT EXISTS products (
     inventory INT UNSIGNED,
     version BIGINT DEFAULT 0,
     status VARCHAR(50) DEFAULT 'ACTIVE',
+    average_rating DOUBLE DEFAULT 0.0,
     seller_id BIGINT,
     
     FOREIGN KEY (seller_id)
@@ -89,7 +93,7 @@ CREATE TABLE IF NOT EXISTS product_reviews (
     rating INT,
     comment TEXT,
     helpful_counter BIGINT DEFAULT 0,
-    verified_purchase BIT(1) DEFAULT 0,
+    verified_purchase TINYINT(1) DEFAULT 0,
 
     user_id BIGINT NOT NULL,
     product_id BIGINT NOT NULL,
@@ -104,6 +108,14 @@ CREATE TABLE IF NOT EXISTS product_reviews (
     REFERENCES products(id)
     ON DELETE CASCADE
 ) AUTO_INCREMENT = 10001;
+
+CREATE TABLE product_review_helpful_users (
+    review_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    PRIMARY KEY (review_id, user_id),
+    CONSTRAINT fk_helpful_review FOREIGN KEY (review_id) REFERENCES product_reviews(id) ON DELETE CASCADE,
+    CONSTRAINT fk_helpful_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
 CREATE TABLE IF NOT EXISTS categories(
 	id BIGINT AUTO_INCREMENT PRIMARY KEY,

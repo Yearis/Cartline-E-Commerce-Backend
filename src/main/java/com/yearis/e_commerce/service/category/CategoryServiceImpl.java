@@ -2,6 +2,7 @@ package com.yearis.e_commerce.service.category;
 
 import com.yearis.e_commerce.entity.Category;
 import com.yearis.e_commerce.exception.CategoryNotFoundException;
+import com.yearis.e_commerce.exception.ResourceAlreadyExistsException;
 import com.yearis.e_commerce.payload.category.CategoryRequest;
 import com.yearis.e_commerce.payload.category.CategoryResponse;
 import com.yearis.e_commerce.repository.category.CategoryRepository;
@@ -46,7 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse addCategory(CategoryRequest request) {
 
         if (categoryRepository.existsByName(request.getName())) {
-            throw new CategoryNotFoundException("Category with name '" + request.getName() + "' already exists.");
+            throw new ResourceAlreadyExistsException("Category with name '" + request.getName() + "' already exists.");
         }
 
         Category newCategory = mapToEntity(request);

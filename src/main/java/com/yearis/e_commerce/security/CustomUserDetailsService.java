@@ -22,6 +22,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
+        if (user.isDeleted()) {
+            throw new UsernameNotFoundException("This account has been deleted and is no longer active.");
+        }
+
         return new CustomUserDetails(user);
     }
 }

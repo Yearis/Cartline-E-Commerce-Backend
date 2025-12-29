@@ -150,13 +150,15 @@ public class UserServiceImpl implements UserService {
         String uniqueDeletedEmail = "deleted_" + currentUser.getId() + "@cartline.com";
         currentUser.setEmail(uniqueDeletedEmail);
 
-        currentUser.setPassword("");
+        currentUser.setPassword("DELETED_ACCOUNT_" + java.util.UUID.randomUUID());
         currentUser.setDeleted(true);
 
         currentUser.getRoles().clear();
 
         // if everything's alright we delete it now
         userRepository.save(currentUser);
+
+        SecurityContextHolder.clearContext();
 
         return "User Successfully Deleted!";
     }

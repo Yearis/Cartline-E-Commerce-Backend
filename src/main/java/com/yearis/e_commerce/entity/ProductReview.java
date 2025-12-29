@@ -9,12 +9,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "product_reviews")
+@Table(name = "product_reviews", uniqueConstraints = {
+        @UniqueConstraint(name = "unique_user_prod_rev", columnNames = {"user_id", "product_id"})
+})
 public class ProductReview {
 
     @Id
@@ -30,6 +35,14 @@ public class ProductReview {
     @Size(min = 2, max = 500, message = "Comment must be between 2 and 500")
     @Column(name = "comment", nullable = false)
     private String comment;
+
+    @ElementCollection
+    @CollectionTable(
+            name = "product_review_helpful_users",
+            joinColumns = @JoinColumn(name = "review_id")
+    )
+    @Column(name = "user_id")
+    private Set<Long> helpfulUserIds = new HashSet<>();
 
     @Column(name = "helpful_counter")
     private Long helpfulCounter = 0L;

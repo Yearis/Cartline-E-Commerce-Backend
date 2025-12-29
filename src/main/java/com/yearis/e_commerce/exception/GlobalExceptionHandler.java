@@ -21,6 +21,7 @@ public class GlobalExceptionHandler {
             CartItemNotFoundException.class,
             RoleNotFoundException.class,
             SellerNotFoundException.class,
+            ReviewNotFoundException.class,
             UsernameNotFoundException.class
     })
     public ResponseEntity<ErrorResponse> handleResourceNotFound(RuntimeException ex) {

@@ -5,6 +5,7 @@ import com.yearis.e_commerce.entity.Product;
 import com.yearis.e_commerce.entity.Seller;
 import com.yearis.e_commerce.entity.User;
 import com.yearis.e_commerce.enums.ProductStatus;
+import com.yearis.e_commerce.enums.SellerStatus;
 import com.yearis.e_commerce.exception.*;
 import com.yearis.e_commerce.payload.product.ProductRequest;
 import com.yearis.e_commerce.payload.category.CategoryResponse;
@@ -62,6 +63,7 @@ public class ProductServiceImpl implements ProductService {
         response.setPrice(product.getPrice());
         response.setDiscount(product.getDiscount());
         response.setInventory(product.getInventory());
+        response.setAverageRating(product.getAverageRating());
         response.setStatus(product.getStatus());
 
         // if there is a discount we set the discounted price as price
@@ -103,6 +105,7 @@ public class ProductServiceImpl implements ProductService {
         summary.setBrand(product.getBrand());
         summary.setPrice(product.getPrice());
         summary.setDiscount(product.getDiscount());
+        summary.setAverageRating(product.getAverageRating());
         summary.setStatus(product.getStatus());
 
         if (product.getDiscount() != null && product.getDiscount().compareTo(BigDecimal.ZERO) > 0) {
@@ -188,6 +191,10 @@ public class ProductServiceImpl implements ProductService {
 
         Seller seller = sellerRepository.findById(currentUser.getSeller().getId())
                 .orElseThrow(() -> new SellerNotFoundException("Seller not found."));
+
+        if (!seller.getSellerStatus().equals(SellerStatus.APPROVED)) {
+            throw new ActionNotAllowedException("Your seller account is not approved. You cannot add products.");
+        }
 
         Product newProduct = mapToEntity(productRequest);
 

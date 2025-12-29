@@ -27,6 +27,8 @@ public class ProductResponse {
 
     private int inventory;
 
+    private Double averageRating;
+
     private ProductStatus status;
 
     private List<CategoryResponse> category;

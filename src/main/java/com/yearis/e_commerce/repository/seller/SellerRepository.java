@@ -2,6 +2,7 @@ package com.yearis.e_commerce.repository.seller;
 
 import com.yearis.e_commerce.entity.Address;
 import com.yearis.e_commerce.entity.Seller;
+import com.yearis.e_commerce.enums.SellerStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,6 @@ public interface SellerRepository extends JpaRepository<Seller, Long> {
     boolean existsByAddress(Address address);
 
     Page<Seller> findSellersByStoreNameContaining(String name, Pageable pageable);
+
+    Page<Seller> findSellersBySellerStatus(SellerStatus sellerStatus, Pageable pageable);
 }

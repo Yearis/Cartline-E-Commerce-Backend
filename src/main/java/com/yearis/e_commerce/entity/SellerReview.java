@@ -13,7 +13,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "seller_reviews")
+@Table(name = "seller_reviews", uniqueConstraints = {
+        @UniqueConstraint(name = "unique_user_seller_rev", columnNames = {"user_id", "seller_id"})
+})
 public class SellerReview {
 
     @Id
