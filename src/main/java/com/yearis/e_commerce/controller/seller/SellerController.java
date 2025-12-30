@@ -19,7 +19,7 @@ import java.util.List;
 @Tag(name = "Seller Rest API Endpoints", description = "Operations for seller")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/seller")
+@RequestMapping("/api/sellers")
 public class SellerController {
 
     private final SellerService sellerService;
@@ -43,6 +43,16 @@ public class SellerController {
         SellerResponse response = sellerService.getSellerById(sellerId);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get Application Status", description = "Check the current status of the logged in user's seller application")
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/status")
+    public ResponseEntity<String> getSellerApplicationStatus() {
+
+        String statusMessage = sellerService.getSellerApplicationStatus();
+
+        return new ResponseEntity<>(statusMessage, HttpStatus.OK);
     }
 
     @Operation(summary = "Search Sellers by store name", description = "Search for sellers by store name")

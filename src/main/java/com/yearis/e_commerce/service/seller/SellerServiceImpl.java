@@ -79,7 +79,10 @@ public class SellerServiceImpl implements SellerService {
         User currentUser = currentUser();
 
         // we check if they already have a store which is not closed
-        sellerRepository.findById(currentUser.getId()).ifPresent(existingSeller -> {
+        Seller existingSeller = sellerRepository.findById(currentUser.getId()).orElse(null);
+
+        if (existingSeller != null) {
+
             SellerStatus status = existingSeller.getSellerStatus();
 
             if (status == SellerStatus.PENDING) {
@@ -91,8 +94,33 @@ public class SellerServiceImpl implements SellerService {
             if (status == SellerStatus.BANNED) {
                 throw new ActionNotAllowedException("Your account is banned. Contact Admin.");
             }
+
             // If REJECTED or CLOSED, they can re-apply
-        });
+
+            // when they re-apply if the name is diff from thier existng name in database,
+            // we check if it's not already taken
+            if (!existingSeller.getStoreName().equalsIgnoreCase(sellerRequest.getStoreName())) {
+                if (sellerRepository.existsByStoreName(sellerRequest.getStoreName())) {
+                    throw new ResourceAlreadyExistsException("Store name '" + sellerRequest.getStoreName() + "' is already taken.");
+                }
+            }
+
+            // same for phone number
+            if (!existingSeller.getBusinessPhoneNumber().equals(sellerRequest.getBusinessPhoneNumber())) {
+                if (sellerRepository.existsByBusinessPhoneNumber(sellerRequest.getBusinessPhoneNumber())) {
+                    throw new ResourceAlreadyExistsException("Phone number is already in use.");
+                }
+            }
+
+            // if not we allow them to re-apply
+            existingSeller.setStoreName(sellerRequest.getStoreName());
+            existingSeller.setBusinessPhoneNumber(sellerRequest.getBusinessPhoneNumber());
+            existingSeller.setAddress(sellerRequest.getBusinessAddress());
+            existingSeller.setSellerStatus(SellerStatus.PENDING);
+
+            return mapToResponse(sellerRepository.save(existingSeller));
+        }
+
         // now we check if store name is already taken
         if (sellerRepository.existsByStoreName(sellerRequest.getStoreName())) {
 
@@ -125,6 +153,37 @@ public class SellerServiceImpl implements SellerService {
                 .orElseThrow(() -> new SellerNotFoundException("Seller not found."));
 
         return mapToResponse(seller);
+    }
+
+    @Override
+    public String getSellerApplicationStatus() {
+
+        User currentUser = currentUser();
+        Seller seller = currentUser.getSeller();
+
+        // If the user has never applied, seller will be null as it's never created in applyForSeller
+        if (seller == null) {
+            return "You have not submitted a seller application yet.";
+        }
+
+        SellerStatus status = seller.getSellerStatus();
+
+        return switch (status) {
+            case PENDING ->
+                    "Your application is currently under review. Please wait for the admini's decision.";
+
+            case APPROVED ->
+                    "Congratulations! Your application has been approved. You can now access your seller dashboard.";
+
+            case REJECTED ->
+                    "We regret to inform you that your seller application has been rejected. Please review our guidelines or contact support.";
+
+            case BANNED ->
+                    "Your seller account has been suspended due to a violation of our terms of service. Please contact the admin for further assistance.";
+
+            case CLOSED ->
+                    "Your seller account is currently closed. You may re-apply if you wish to start selling again.";
+        };
     }
 
     @Override

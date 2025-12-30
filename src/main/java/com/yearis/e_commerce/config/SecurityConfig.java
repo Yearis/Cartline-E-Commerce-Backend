@@ -57,7 +57,10 @@ public class SecurityConfig {
 
                         // public things that dont require login
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/{productId}/reviews/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/sellers/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/sellers/{sellerId}/reviews/**").permitAll()
 
                         // swagger docs
                         .requestMatchers( "/swagger-ui/**", "/v3/api-docs/**",

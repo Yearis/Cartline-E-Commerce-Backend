@@ -1,8 +1,8 @@
 package com.yearis.e_commerce.payload.product;
 
-import com.yearis.e_commerce.entity.Seller;
 import com.yearis.e_commerce.enums.ProductStatus;
 import com.yearis.e_commerce.payload.category.CategoryResponse;
+import com.yearis.e_commerce.payload.seller.SellerInfo;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -33,5 +33,5 @@ public class ProductResponse {
 
     private List<CategoryResponse> category;
 
-    private Seller seller;
+    private SellerInfo seller;
 }

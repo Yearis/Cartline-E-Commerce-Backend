@@ -1,7 +1,7 @@
 package com.yearis.e_commerce.payload.product;
 
-import com.yearis.e_commerce.entity.Seller;
 import com.yearis.e_commerce.enums.ProductStatus;
+import com.yearis.e_commerce.payload.seller.SellerInfo;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -25,5 +25,5 @@ public class ProductResponseSummary {
 
     private ProductStatus status;
 
-    private Seller seller;
+    private SellerInfo seller;
 }

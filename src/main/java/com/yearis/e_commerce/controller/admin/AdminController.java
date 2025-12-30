@@ -17,7 +17,7 @@ import java.util.List;
 @Tag(name = "Admin Rest API Endpoints", description = "Operations for admin")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admins")
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 

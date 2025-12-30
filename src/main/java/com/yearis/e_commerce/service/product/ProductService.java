@@ -42,9 +42,9 @@ public interface ProductService {
 
     List<ProductResponseSummary> getAllProductsBySeller(Long sellerId, int pageNo, int pageSize);
 
-    List<ProductResponseSummary> getBySellerIdAndCategoriesNameIgnoreCaseAndStatus(Long sellerId, String category, int pageNo, int pageSize);
+    List<ProductResponseSummary> getAllProductBySellerAndCategory(Long sellerId, String category, int pageNo, int pageSize);
 
-    List<ProductResponseSummary> getBySellerIdAndBrandAndStatus(Long sellerId, String brand, int pageNo, int pageSize);
+    List<ProductResponseSummary> getAllProductBySellerAndBrand(Long sellerId, String brand, int pageNo, int pageSize);
 
-    List<ProductResponseSummary> getBySellerIdAndNameContainingAndStatus(Long sellerId, String name, int pageNo, int pageSize);
+    List<ProductResponseSummary> getAllProductBySellerAndName(Long sellerId, String name, int pageNo, int pageSize);
 }

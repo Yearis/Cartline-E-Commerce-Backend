@@ -18,7 +18,7 @@ import java.util.List;
 @Tag(name = "Order Rest API Endpoints", description = "Operations related to order")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/api/orders")
 @PreAuthorize("hasRole('USER')")
 public class OrderController {
 

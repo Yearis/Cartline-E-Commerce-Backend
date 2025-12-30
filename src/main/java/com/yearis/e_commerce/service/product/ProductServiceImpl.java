@@ -11,6 +11,7 @@ import com.yearis.e_commerce.payload.product.ProductRequest;
 import com.yearis.e_commerce.payload.category.CategoryResponse;
 import com.yearis.e_commerce.payload.product.ProductResponse;
 import com.yearis.e_commerce.payload.product.ProductResponseSummary;
+import com.yearis.e_commerce.payload.seller.SellerInfo;
 import com.yearis.e_commerce.repository.category.CategoryRepository;
 import com.yearis.e_commerce.repository.product.ProductRepository;
 import com.yearis.e_commerce.repository.seller.SellerRepository;
@@ -52,6 +53,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     // --- Mappers ---
+    private SellerInfo mapSellerToInfo(Seller seller) {
+
+        SellerInfo info = new SellerInfo();
+        info.setId(seller.getId());
+        info.setStoreName(seller.getStoreName());
+
+        return info;
+    }
 
     private ProductResponse mapToResponse(Product product) {
 
@@ -92,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
                     return summary;
                 }).toList();
         response.setCategory(categoriesSummaries);
-        response.setSeller(product.getSeller());
+        response.setSeller(mapSellerToInfo(product.getSeller()));
 
         return response;
     }
@@ -123,7 +132,7 @@ public class ProductServiceImpl implements ProductService {
             summary.setDiscountedPrice(product.getPrice());
         }
 
-        summary.setSeller(product.getSeller());
+        summary.setSeller(mapSellerToInfo(product.getSeller()));
 
         return summary;
     }
@@ -424,7 +433,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseSummary> getBySellerIdAndCategoriesNameIgnoreCaseAndStatus(Long sellerId, String category, int pageNo, int pageSize) {
+    public List<ProductResponseSummary> getAllProductBySellerAndCategory(Long sellerId, String category, int pageNo, int pageSize) {
 
         Sort sort = Sort.by("averageRating").descending()
                 .and(Sort.by("price")).descending();
@@ -439,7 +448,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseSummary> getBySellerIdAndBrandAndStatus(Long sellerId, String brand, int pageNo, int pageSize) {
+    public List<ProductResponseSummary> getAllProductBySellerAndBrand(Long sellerId, String brand, int pageNo, int pageSize) {
 
         Sort sort = Sort.by("averageRating").descending()
                 .and(Sort.by("price")).descending();
@@ -454,7 +463,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseSummary> getBySellerIdAndNameContainingAndStatus(Long sellerId, String name, int pageNo, int pageSize) {
+    public List<ProductResponseSummary> getAllProductBySellerAndName(Long sellerId, String name, int pageNo, int pageSize) {
 
         Sort sort = Sort.by("averageRating").descending()
                 .and(Sort.by("price")).descending();
@@ -467,5 +476,4 @@ public class ProductServiceImpl implements ProductService {
                 .map(product -> mapToSummary(product))
                 .collect(Collectors.toList());
     }
-
 }

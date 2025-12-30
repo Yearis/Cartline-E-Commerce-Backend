@@ -198,8 +198,3 @@ CREATE TABLE IF NOT EXISTS order_items (
     REFERENCES orders(id)
     ON DELETE CASCADE
 )AUTO_INCREMENT = 10001;
-
-INSERT INTO roles (name) VALUES ('ROLE_USER');
-INSERT INTO roles (name) VALUES ('ROLE_ADMIN');
-
-INSERT IGNORE INTO users_roles (user_id, role_id) VALUES (10001, 10002);

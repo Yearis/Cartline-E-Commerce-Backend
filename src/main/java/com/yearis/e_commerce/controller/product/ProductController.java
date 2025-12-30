@@ -153,4 +153,55 @@ public class ProductController {
 
         return new ResponseEntity<>("Success", HttpStatus.OK);
     }
+
+    @Operation(summary = "Get all products by a seller", description = "Find all products from a seller")
+    @GetMapping("/seller/{sellerId}")
+    public ResponseEntity<List<ProductResponseSummary>> getAllProductsBySeller(
+            @Parameter(description = "ID of the seller") @PathVariable Long sellerId,
+            @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize) {
+
+        List<ProductResponseSummary> products = productService.getAllProductsBySeller(sellerId, pageNo, pageSize);
+
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Search products by seller and category", description = "Find products by seller and category")
+    @GetMapping("/seller/{sellerId}/search/category")
+    public ResponseEntity<List<ProductResponseSummary>> getProductsBySellerAndCategory(
+            @Parameter(description = "ID of the seller") @PathVariable Long sellerId,
+            @Parameter(description = "Category name") @RequestParam String category,
+            @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize) {
+
+        List<ProductResponseSummary> products = productService.getAllProductBySellerAndCategory(sellerId, category, pageNo, pageSize);
+
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Search products by seller and brand", description = "Find products by seller and brand")
+    @GetMapping("/seller/{sellerId}/search/brand")
+    public ResponseEntity<List<ProductResponseSummary>> getProductsBySellerAndBrand(
+            @Parameter(description = "ID of the seller") @PathVariable Long sellerId,
+            @Parameter(description = "Brand name") @RequestParam String brand,
+            @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize) {
+
+        List<ProductResponseSummary> products = productService.getAllProductBySellerAndBrand(sellerId, brand, pageNo, pageSize);
+
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Search products by seller and name", description = "Find products by seller and name")
+    @GetMapping("/seller/{sellerId}/search/name")
+    public ResponseEntity<List<ProductResponseSummary>> getProductsBySellerAndName(
+            @Parameter(description = "ID of the seller") @PathVariable Long sellerId,
+            @Parameter(description = "Product name") @RequestParam String name,
+            @RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize) {
+
+        List<ProductResponseSummary> products = productService.getAllProductBySellerAndName(sellerId, name, pageNo, pageSize);
+
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
 }

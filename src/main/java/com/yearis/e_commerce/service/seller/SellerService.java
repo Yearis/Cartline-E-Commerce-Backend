@@ -13,6 +13,8 @@ public interface SellerService {
 
     SellerResponse getSellerById(Long sellerId);
 
+    String getSellerApplicationStatus();
+
     List<SellerResponse> getSellerByStoreName(String name, int pageNo, int pageSize);
 
     SellerResponse updateSellerInfo(SellerUpdateRequest sellerUpdateRequest);
