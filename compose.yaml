@@ -4,36 +4,63 @@ version: '3.8'
 # List of my technologies used
 services:
 
-  # 1st technology is MySQL we fix its version to 8.0
-  mysql:
-    image: 'mysql:8.0'
-    container_name: mysql_e_commerce_db_container
-    env_file: .env
-    # we set our credentials
-    environment:
-      MYSQL_DATABASE: ${MYSQL_DB}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASS}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASS}
+    # 1st technology is MySQL we fix its version to 8.0
+    mysql:
+        image: 'mysql:8.0'
+        container_name: mysql_e_commerce_db_container
+        env_file: .env
+        # we set our credentials
+        environment:
+            MYSQL_DATABASE: ${MYSQL_DB}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASS}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASS}
 
-    # we set our port for our database
-    ports:
-      - '3309:3306'
+        # we set our port for our database
+        ports:
+            - '3309:3306'
 
-    # our storage for container
-    volumes:
-      - mysql_e_commerce_db_data:/var/lib/mysql
+        # our storage for container
+        volumes:
+            - mysql_e_commerce_db_data:/var/lib/mysql
 
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 5s
-      retries: 10
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+            timeout: 5s
+            retries: 10
 
-    restart: always
+        restart: always
+
+    # 2nd technology is Redis
+    redis:
+        image: 'redis:7.4-alpine'
+        container_name: redis_e_commerce_cache_container
+        
+        # we set our ports
+        ports:
+            - '6379:6379'
+        volumes:
+            - redis_e_commerce_cache_data:/data
+
+        command: >
+            redis-server 
+            --appendonly yes 
+            --appendfsync everysec 
+            --auto-aof-rewrite-percentage 100 
+            --auto-aof-rewrite-min-size 64mb
+
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+        restart: always
 
 # we declare our storage
 volumes:
-  mysql_e_commerce_db_data:
+    mysql_e_commerce_db_data:
+    redis_e_commerce_cache_data:
 
 # commands
 #   To run the container: docker-compose up -d
