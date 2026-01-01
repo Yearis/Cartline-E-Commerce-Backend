@@ -57,6 +57,21 @@ services:
 
         restart: always
 
+    backend:
+        build: .
+        container_name: cartline-backend
+        ports:
+            - '8080:8080'
+        depends_on:
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        env_file: .env
+        environment:
+            DB_URL: jdbc:mysql://mysql:3306/${MYSQL_DB}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+            REDIS_HOST: redis
+
 # we declare our storage
 volumes:
     mysql_e_commerce_db_data:

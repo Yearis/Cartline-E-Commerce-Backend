@@ -1,20 +1,19 @@
 package com.yearis.e_commerce.payload.auth;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+@Data
 @NoArgsConstructor
-@Getter
 public class JwtAuthResponse {
-
-    @Setter
-    private String token;
+    private String accessToken;
+    private String refreshToken;
 
     private final String tokenType = "Bearer";
 
-    public JwtAuthResponse(String token) {
-        this.token = token;
+    public JwtAuthResponse(String accessToken, String refreshToken) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
     }
 
 }

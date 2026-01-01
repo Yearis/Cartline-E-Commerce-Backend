@@ -1,9 +1,8 @@
 package com.yearis.e_commerce.service.user;
 
-import com.yearis.e_commerce.payload.user.PasswordChangeRequest;
-import com.yearis.e_commerce.payload.user.UserDeleteRequest;
-import com.yearis.e_commerce.payload.user.UserResponse;
-import com.yearis.e_commerce.payload.user.UserUpdateRequest;
+import com.yearis.e_commerce.payload.auth.EmailVerificationRequest;
+import com.yearis.e_commerce.payload.auth.JwtAuthResponse;
+import com.yearis.e_commerce.payload.user.*;
 
 public interface UserService {
 
@@ -15,6 +14,10 @@ public interface UserService {
     UserResponse updateUserProfile(UserUpdateRequest request);
 
     String changePassword(PasswordChangeRequest request);
+
+    String updateEmail(EmailUpdateRequest request);
+
+    JwtAuthResponse verifyUpdatedEmail(EmailVerificationRequest request);
 
     String deleteUser(UserDeleteRequest request);
 }

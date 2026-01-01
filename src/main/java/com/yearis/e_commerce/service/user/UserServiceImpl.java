@@ -1,22 +1,30 @@
 package com.yearis.e_commerce.service.user;
 
 import com.yearis.e_commerce.entity.User;
+import com.yearis.e_commerce.exception.ActionNotAllowedException;
+import com.yearis.e_commerce.exception.BadRequestException;
 import com.yearis.e_commerce.exception.InvalidPasswordException;
-import com.yearis.e_commerce.payload.user.PasswordChangeRequest;
-import com.yearis.e_commerce.payload.user.UserDeleteRequest;
-import com.yearis.e_commerce.payload.user.UserResponse;
-import com.yearis.e_commerce.payload.user.UserUpdateRequest;
+import com.yearis.e_commerce.exception.UserAlreadyExistsException;
+import com.yearis.e_commerce.payload.auth.EmailVerificationRequest;
+import com.yearis.e_commerce.payload.auth.JwtAuthResponse;
+import com.yearis.e_commerce.payload.user.*;
 import com.yearis.e_commerce.repository.user.UserRepository;
+import com.yearis.e_commerce.security.CustomUserDetailsService;
+import com.yearis.e_commerce.security.JwtService;
+import com.yearis.e_commerce.security.RefreshTokenService;
+import com.yearis.e_commerce.service.email.EmailService;
+import com.yearis.e_commerce.service.redis.RedisService;
 import com.yearis.e_commerce.service.seller.SellerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
-import java.util.Set;
+import java.security.SecureRandom;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +35,11 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final SellerService sellerService;
+    private final RedisService redisService;
+    private final EmailService emailService;
+    private final JwtService jwtService;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final RefreshTokenService refreshTokenService;
 
     // get our current user
     private User currentUser() {
@@ -35,6 +48,20 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    // --- Helpers ---
+    private String generateOtp() {
+        // this will generate a number between 100000 and 999999
+        SecureRandom secureRandom = new SecureRandom();
+        int code = secureRandom.nextInt(900000) + 100000;
+        return String.valueOf(code);
+    }
+
+    private void checkUserNotBlocked(String email) {
+        if (redisService.isBlocked(email)) {
+            throw new ActionNotAllowedException("Too many failed attempts. Please try again in 15 minutes.");
+        }
     }
 
     // --- Mappers ---
@@ -128,6 +155,69 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public String updateEmail(EmailUpdateRequest request) {
+
+        User currentUser = currentUser();
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), currentUser.getPassword())) {
+            throw new InvalidPasswordException("Incorrect Password");
+        }
+
+        // now we will check if the newEmail is already taken
+        if (userRepository.existsByEmail(request.getNewEmail())) {
+            throw new UserAlreadyExistsException("This email is already used by another account");
+        }
+
+        checkUserNotBlocked(request.getNewEmail());
+
+        String otp = generateOtp();
+        redisService.saveOtp(request.getNewEmail(), otp);
+        emailService.sendVerificationEmail(request.getNewEmail(), otp);
+
+        return "Verification code sent to " + request.getNewEmail();
+    }
+
+    @Override
+    @Transactional
+    public JwtAuthResponse verifyUpdatedEmail(EmailVerificationRequest request) {
+
+        User currentUser = currentUser();
+
+        checkUserNotBlocked(request.getEmail());
+
+        String savedOtp = redisService.getOtp(request.getEmail());
+
+        if (savedOtp == null || !savedOtp.equals(request.getOtp())) {
+
+            redisService.incrementAttemptsFailed(request.getEmail());
+
+            throw new BadRequestException("Invalid or expired OTP");
+        }
+
+        redisService.clearAttempts(request.getEmail());
+
+        // we recheck it in case someone make a new account while we were updating our mail
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new UserAlreadyExistsException("This email is already used by another account");
+        }
+
+        // now we can update it
+        currentUser.setEmail(request.getEmail());
+        User savedUser = userRepository.save(currentUser);
+
+        redisService.deleteOtp(request.getEmail());
+
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(savedUser.getEmail());
+
+        String newToken = jwtService.generateToken(new HashMap<>(), userDetails);
+
+        String newRefreshToken = refreshTokenService.createRefreshToken(request.getEmail());
+
+        return new JwtAuthResponse(newToken, newRefreshToken);
+    }
+
+    @Override
+    @Transactional
     public String deleteUser(UserDeleteRequest request) {
 
         // we get the current user as only you are able to delete your own acc
@@ -150,7 +240,7 @@ public class UserServiceImpl implements UserService {
         String uniqueDeletedEmail = "deleted_" + currentUser.getId() + "@cartline.com";
         currentUser.setEmail(uniqueDeletedEmail);
 
-        currentUser.setPassword("DELETED_ACCOUNT_" + java.util.UUID.randomUUID());
+        currentUser.setPassword("DELETED_ACCOUNT_" + UUID.randomUUID());
         currentUser.setDeleted(true);
 
         currentUser.getRoles().clear();

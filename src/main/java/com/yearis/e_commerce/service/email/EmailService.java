@@ -13,11 +13,11 @@ public class EmailService {
 
     private final JavaMailSender javaMailSender;
 
-    @Value("${spring.mail.username}")
+    @Value("${app.email.from}")
     private String senderEmail;
 
     @Async
-    public void sendVerficationEmail(String receiverEmail, String otp) {
+    public void sendVerificationEmail(String receiverEmail, String otp) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
 
         mailMessage.setFrom(senderEmail);

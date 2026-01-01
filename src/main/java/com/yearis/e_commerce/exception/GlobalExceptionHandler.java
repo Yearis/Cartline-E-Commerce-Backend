@@ -39,7 +39,10 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "Invalid Action", ex.getMessage());
     }
 
-    @ExceptionHandler(ResourceAccessDeniedException.class)
+    @ExceptionHandler({
+            ResourceAccessDeniedException.class,
+            BadRequestException.class
+    })
     public ResponseEntity<ErrorResponse> handleAccessDenied(RuntimeException ex) {
 
         return buildResponse(HttpStatus.FORBIDDEN, "Access Denied", ex.getMessage());

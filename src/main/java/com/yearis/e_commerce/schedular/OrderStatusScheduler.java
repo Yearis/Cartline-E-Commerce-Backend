@@ -19,7 +19,6 @@ public class OrderStatusScheduler {
 
     @Scheduled(cron = "@hourly")
     @Transactional
-
     public void autoUpdateOrderStatus() {
 
         LocalDateTime now = LocalDateTime.now();
