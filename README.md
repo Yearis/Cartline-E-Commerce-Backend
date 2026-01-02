@@ -60,7 +60,7 @@ Follow these steps to set up the project locally using Docker.
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/yourusername/cartline-backend.git](https://github.com/yourusername/cartline-backend.git)
+git clone [https://github.com/Yearis/cartline-backend.git](https://github.com/Yearis/cartline-backend.git)
 cd cartline-backend
 ```
 
