@@ -1,7 +1,7 @@
 # 🛒 Cartline E-Commerce API
 
 ![Java](https://img.shields.io/badge/Java-21-orange)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-green)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.x-green)
 ![Hibernate](https://img.shields.io/badge/Hibernate-ORM-59666C?style=flat&logo=hibernate&logoColor=white)
 ![Maven](https://img.shields.io/badge/Maven-Build-C71A36?style=flat&logo=apachemaven&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-Security-black?style=flat&logo=jsonwebtokens&logoColor=white)
