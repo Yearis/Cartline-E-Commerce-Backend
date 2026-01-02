@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartline API Documentation</title>
+    <style>
+
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #24292e;
+            --header-border: #e1e4e8;
+            --code-bg: #f6f8fa;
+            --btn-bg: #2da44e;
+            --btn-hover: #2c974b;
+            --btn-text: #ffffff;
+            --card-bg: #f6f8fa;
+            --link-color: #0366d6;
+            --toggle-icon: "🌙";
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #0d1117;
+            --text-color: #c9d1d9;
+            --header-border: #30363d;
+            --code-bg: #161b22;
+            --btn-bg: #238636;
+            --btn-hover: #2ea043;
+            --btn-text: #ffffff;
+            --card-bg: #161b22;
+            --link-color: #58a6ff;
+            --toggle-icon: "☀️";
+        }
+
+        /* --- Base Styles --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* --- Header & Badges --- */
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--header-border);
+            padding-bottom: 2rem;
+            position: relative;
+        }
+
+        h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+
+        .badges img {
+            margin: 0 3px;
+            height: 20px;
+        }
+
+        /* --- Dark Mode Toggle Button --- */
+        .theme-toggle-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+
+            background-color: var(--bg-color);
+            border: 1px solid var(--header-border);
+            color: var(--text-color);
+            font-size: 1.2rem;
+            padding: 0.5rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .theme-toggle-btn:hover {
+            background-color: var(--code-bg);
+            transform: scale(1.05);
+        }
+        .theme-toggle-btn::after {
+            content: var(--toggle-icon);
+        }
+
+        /* --- The "Test API" Button --- */
+        .cta-container {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 2rem;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--header-border);
+        }
+
+        .btn-api {
+            display: inline-block;
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            padding: 12px 24px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-api:hover {
+            background-color: var(--btn-hover);
+            transform: translateY(-1px);
+        }
+
+        /* --- Content Styling --- */
+        h2 { margin-top: 2rem; border-bottom: 1px solid var(--header-border); padding-bottom: 0.3rem; }
+        h3 { margin-top: 1.5rem; color: var(--text-color); }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 0.5rem; }
+        a { color: var(--link-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        code {
+            background-color: var(--code-bg);
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 85%;
+        }
+
+        footer {
+            margin-top: 4rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #8b949e;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <button class="theme-toggle-btn" id="themeToggle" aria-label="Toggle Dark Mode"></button>
+
+    <h1>🛒 Cartline E-Commerce API</h1>
+    <div class="badges">
+        <img src="https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white" alt="Java">
+        <img src="https://img.shields.io/badge/Spring_Boot-3.x-green?logo=springboot&logoColor=white" alt="Spring Boot">
+        <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white" alt="MySQL">
+        <img src="https://img.shields.io/badge/Hibernate-ORM-59666C?logo=hibernate&logoColor=white" alt="Hibernate">
+        <img src="https://img.shields.io/badge/Redis-Caching-DC382D?logo=redis&logoColor=white" alt="Redis">
+        <img src="https://img.shields.io/badge/Docker-Enabled-2496ED?logo=docker&logoColor=white" alt="Docker">
+        <img src="https://img.shields.io/badge/Maven-Build-C71A36?logo=apachemaven&logoColor=white" alt="Maven">
+        <img src="https://img.shields.io/badge/JWT-Security-black?logo=jsonwebtokens&logoColor=white" alt="JWT">
+        <img src="https://img.shields.io/badge/Swagger-OpenAPI-85EA2D?logo=swagger&logoColor=black" alt="Swagger">
+    </div>
+</header>
+
+<div class="cta-container">
+    <p>Ready to explore the backend?</p>
+    <a href="/cartline/docs" class="btn-api">⚡ Test the APIs Yourself</a>
+    <p style="margin-top: 10px; font-size: 0.9rem; opacity: 0.8;">(Takes you to Swagger UI)</p>
+</div>
+
+<main>
+    <p><strong>Cartline</strong> is a robust, enterprise-grade backend for an e-commerce platform. It features a secure <strong>Dual-Token Authentication</strong> system, Role-Based Access Control (<strong>RBAC</strong>), and high-performance caching using <strong>Redis</strong>.</p>
+
+    <h2>🚀 Key Features</h2>
+
+    <h3>🔐 Security & Authentication</h3>
+    <ul>
+        <li><strong>Dual-Token System:</strong> Access Token (Short-lived JWT) & Refresh Token (Redis stored).</li>
+        <li><strong>RBAC:</strong> Roles for <code>USER</code>, <code>SELLER</code>, and <code>ADMIN</code>.</li>
+        <li><strong>OTP Verification:</strong> Secure email verification using Redis.</li>
+    </ul>
+
+    <h3>🛍️ Product & Catalog</h3>
+    <ul>
+        <li><strong>Advanced Search:</strong> Filter by Brand, Category, Name, Seller.</li>
+        <li><strong>Inventory Management:</strong> Full CRUD for Products and Categories.</li>
+    </ul>
+
+    <h3>🛒 Shopping Experience</h3>
+    <ul>
+        <li><strong>Smart Cart:</strong> Redis-backed shopping cart for high speed.</li>
+        <li><strong>Order Lifecycle:</strong> Place, track, and cancel orders.</li>
+    </ul>
+
+    <h2>🛠️ Tech Stack</h2>
+    <ul>
+        <li><strong>Core:</strong> Java 21, Spring Boot 3.x</li>
+        <li><strong>Data:</strong> MySQL 8.0, Hibernate JPA</li>
+        <li><strong>Cache:</strong> Redis</li>
+        <li><strong>Auth:</strong> Spring Security, JWT</li>
+        <li><strong>DevOps:</strong> Docker, Docker Compose</li>
+    </ul>
+
+    <h2>⚙️ API Usage</h2>
+    <p>This API follows RESTful conventions. You can use the button above to access the interactive Swagger documentation to test endpoints like:</p>
+    <ul>
+        <li><code>POST /auth/register</code> - Create a new account</li>
+        <li><code>GET /products</code> - Browse the catalog</li>
+        <li><code>POST /cart/add</code> - Add items to cart</li>
+    </ul>
+</main>
+
+<footer>
+    <p>Created by <a href="https://github.com/Yearis" target="_blank">👨‍💻 Yearis</a> | Cartline Backend API</p>
+</footer>
+
+<script>
+    const toggleBtn = document.getElementById('themeToggle');
+    const htmlElement = document.documentElement;
+
+    // 1. Check Local Storage on Load
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    htmlElement.setAttribute('data-theme', currentTheme);
+
+    // 2. Toggle Function
+    toggleBtn.addEventListener('click', () => {
+        const current = htmlElement.getAttribute('data-theme');
+        const newTheme = current === 'light' ? 'dark' : 'light';
+
+        htmlElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+    });
+</script>
+</body>
+</html>
